@@ -5,8 +5,8 @@ EAPI=6
 
 inherit user cmake-utils git-r3
 
-DESCRIPTION="C(ontinued)-MaNGOS (Classic fork) is about: -- Doing WoW-Emulation Right!"
-HOMEPAGE="https://metagit.org/blizzlike/cmangos-classic"
+DESCRIPTION="C(ontinued)-MaNGOS is about: -- Doing WoW-Emulation Right!"
+HOMEPAGE="https://metagit.org/blizzlike/cmangos-wotlk"
 EGIT_REPO_URI="https://metagit.org/blizzlike/${PN}.git"
 
 LICENSE="GPL-2"
@@ -24,8 +24,8 @@ RDEPEND="
 	sys-libs/zlib
 	app-arch/bzip2
 	dev-libs/boost[static-libs]
+	!games-server/cmangos-classic
 	!games-server/cmangos-tbc
-	!games-server/cmangos-wotlk
 	"
 DEPEND="${RDEPEND}"
 

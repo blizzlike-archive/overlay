@@ -25,6 +25,7 @@ RDEPEND="
 	app-arch/bzip2
 	dev-libs/boost[static-libs]
 	!games-server/cmangos-classic
+	!games-server/cmangos-wotlk
 	"
 DEPEND="${RDEPEND}"
 
