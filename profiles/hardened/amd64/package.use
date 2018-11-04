@@ -1,0 +1,4 @@
+dev-libs/boost static-libs
+dev-libs/ace tao
+
+games-server/cmangos-classic extractors login scriptdev world playerbot
