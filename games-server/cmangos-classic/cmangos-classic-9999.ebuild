@@ -65,7 +65,14 @@ src_install() {
 		fi
 
 		if use login; then
+			newinitd "${FILESDIR}"/realmd.initd realmd
 			mv ${ED}/etc/realmd.conf.dist ${ED}/etc/realmd.conf || die
+			sed -i \
+				-e 's_PidFile = ""_PidFile = "/run/cmangos/realmd.pid"_' \
+				-e 's_LogsDir = ""_LogsDir = "/var/log/cmangos"_' \
+				${ED}/etc/realmd.conf || die
 		fi
 	fi
+
+	keepdir /var/log/cmangos
 }
