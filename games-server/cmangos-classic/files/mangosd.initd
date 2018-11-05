@@ -2,17 +2,17 @@
 # Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-name="cmangos-classic realmd daemon"
-description="cmangos-classic wow emulation logon server"
-pidfile=${pidfile:-"/run/cmangos/realmd-classic.pid"}
-command=/usr/bin/realmd-cmangos-classic
-command_args=${realmd_args:-"-c /etc/cmangos/realmd-classic.conf"}
+name="cmangos-classic mangosd daemon"
+description="cmangos-classic wow emulation world server"
+pidfile=${pidfile:-"/run/cmangos/mangosd-classic.pid"}
+command=/usr/bin/mangosd-cmangos-classic
+command_args=${mangosd_args:-"-c /etc/cmangos/mangosd-classic.conf"}
 stopsig="SIGINT"
 user=${user:-cmangos}
 group=${group:-cmangos}
 
 start_stop_daemon_args="--user ${user} --group ${group} \
-	--stdout /var/log/cmangos-classic/realmd-stdout.log \
+	--stdout /var/log/cmangos-classic/mangosd-stdout.log \
 	--background"
 
 depend() {
