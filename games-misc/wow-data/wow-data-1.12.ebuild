@@ -34,20 +34,21 @@ src_compile() {
 	local lang="$(wow_get_l10n)"
 
 	for l in ${lang}; do
-		install -d "${l}" "${l}/vmaps"
-
-		einfo "Extracting dbc's and maps (${l})"
-		ad -i "${S}/WoW-1.12-${l}" -o "${l}" || die
-
-		einfo "Extracating vmaps (${l})"
-		pushd "${WORKDIR}/${l}" || die
-		vmap_extractor -d "${S}/WoW-1.12-${l}/Data" || die
-		popd || die
-
-		einfo "Assemble vmaps (${l})"
-		vmap_assembler "${l}/Buildings" "${l}/vmaps" || die
-		rm -rf "${l}/Buildings" || die
+		einfo "Extracting dbc's (${l})"
+		ad -i "${S}/WoW-1.12-${l}" -e 2 || die
+		mv dbc "${l}" || die
 	done
+
+	einfo "Extracting vmaps"
+	local l="enUS"
+	if ! use l10n_en-US; then
+		l="$(echo ${lang} | awk '{ print $1 }')"
+	fi
+
+	install -d vmaps
+	ad -i "${S}/WoW-1.12-${l}" -e 1 || die
+	vmap_extractor -d "${S}/WoW-1.12-${l}/Data" || die
+	vmap_assembler Buildings vmaps || die
 }
 
 src_install() {
@@ -56,7 +57,13 @@ src_install() {
 	dodir "/usr/share/${P}"
 	insinto "/usr/share/${P}"
 
+	doins -r "${WORKDIR}/maps"
+	doins -r "${WORKDIR}/vmaps"
+
 	for l in ${lang}; do
+		einfo "Installing dbc's (${l})"
+		dodir "/usr/share/${P}/dbc"
+		insinto "/usr/share/${P}/dbc"
 		doins -r "${WORKDIR}/${l}"
 	done
 }
