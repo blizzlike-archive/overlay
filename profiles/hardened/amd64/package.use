@@ -1,4 +1,4 @@
 dev-libs/boost static-libs
 dev-libs/ace tao -fltk -opengl
 
-games-server/cmangos-vanilla extractors login scriptdev world playerbot
+games-server/cmangos-vanilla extractors login scriptdev2 world playerbot
