@@ -12,10 +12,10 @@ RESTRICT="fetch"
 LICENSE="WoW-EULA-2006-JUNE"
 SLOT="0"
 KEYWORDS="amd64 ~x86"
-#IUSE="mmaps"
+IUSE="mmaps"
 
 DEPEND="
-	games-server/cmangos-classic[extractors]
+	games-server/cmangos-vanilla[extractors]
 	"
 
 S="${WORKDIR}"
@@ -49,6 +49,12 @@ src_compile() {
 	ad -i "${S}/WoW-1.12-${l}" -e 1 || die
 	vmap_extractor -d "${S}/WoW-1.12-${l}/Data" || die
 	vmap_assembler Buildings vmaps || die
+
+	if use mmaps; then
+		einfo "Generating mmaps"
+		install -d mmaps
+		MoveMapGen --offMeshInput /usr/share/cmangos-vanilla/offmesh.txt
+	fi
 }
 
 src_install() {
@@ -59,6 +65,10 @@ src_install() {
 
 	doins -r "${WORKDIR}/maps"
 	doins -r "${WORKDIR}/vmaps"
+
+	if use mmaps; then
+		doins -r "${WORKDIR}/mmaps"
+	fi
 
 	for l in ${lang}; do
 		einfo "Installing dbc's (${l})"
