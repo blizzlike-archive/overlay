@@ -2,3 +2,4 @@ dev-libs/boost static-libs
 dev-libs/ace tao -fltk -opengl
 
 games-server/cmangos-vanilla extractors login scriptdev2 world playerbot
+games-misc/wow-data-1.12 l10n_de-DE l10n_en-US mmaps
