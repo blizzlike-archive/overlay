@@ -35,7 +35,7 @@ src_compile() {
 
 	for l in ${lang}; do
 		einfo "Extracting dbc's (${l})"
-		ad -i "${S}/WoW-1.12-${l}" -e 2 || die
+		ad-cmangos-vanilla -i "${S}/WoW-1.12-${l}" -e 2 || die
 		mv dbc "${l}" || die
 	done
 
@@ -46,14 +46,14 @@ src_compile() {
 	fi
 
 	install -d vmaps
-	ad -i "${S}/WoW-1.12-${l}" -e 1 || die
-	vmap_extractor -d "${S}/WoW-1.12-${l}/Data" || die
-	vmap_assembler Buildings vmaps || die
+	ad-cmangos-vanilla -i "${S}/WoW-1.12-${l}" -e 1 || die
+	vmap_extractor-cmangos-vanilla -d "${S}/WoW-1.12-${l}/Data" || die
+	vmap_assembler-cmangos-vanilla Buildings vmaps || die
 
 	if use mmaps; then
 		einfo "Generating mmaps"
 		install -d mmaps
-		MoveMapGen --offMeshInput /usr/share/cmangos-vanilla/offmesh.txt
+		MoveMapGen-cmangos-vanilla --offMeshInput /usr/share/cmangos-vanilla/offmesh.txt
 	fi
 }
 
