@@ -8,6 +8,7 @@ pidfile=${pidfile:-"/run/cmangos-vanilla/mangosd.pid"}
 command=/usr/bin/mangosd-cmangos-vanilla
 command_args=${mangosd_args:-"-c /etc/cmangos-vanilla/mangosd.conf"}
 stopsig="SIGINT"
+retry="SIGINT/35"
 user=${user:-cmangos}
 group=${group:-cmangos}
 

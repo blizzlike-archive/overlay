@@ -19,6 +19,7 @@ REQUIRED_USE="
 	playerbot? ( world )
 	scriptdev2? ( world )
 	postgres? ( || ( login world ) )
+	|| ( extractors login world )
 	"
 
 RDEPEND="
@@ -91,7 +92,7 @@ cmangos-1_src_install() {
 			sed -i \
 				-e 's_DataDir = "."_DataDir = "/usr/share/wow-data-1.12"_' \
 				-e "s_LogsDir = \"\"_LogsDir = \"/var/log/${PN}\"_" \
-				-e "s_PidFile = \"\"_PidFile = \"/run/${PN}/realmd.pid\"_" \
+				-e "s_PidFile = \"\"_PidFile = \"/run/${PN}/mangosd.pid\"_" \
 				-e 's_Console.Enable = 1_Console.Enable = 0_' \
 				"${ED}/etc/${PN}/mangosd.conf" || die
 		fi
@@ -112,4 +113,5 @@ cmangos-1_src_install() {
 
 	keepdir /var/lib/cmangos
 	keepdir /var/log/${PN}
+	fowners cmangos /var/log/${PN}
 }
