@@ -14,7 +14,7 @@ inherit user cmake-utils git-r3
 EGIT_REPO_URI="https://metagit.org/blizzlike/${PN}.git"
 
 LICENSE="GPL-2"
-IUSE="debug extractors +login pch playerbot postgres +scriptdev2 +world"
+IUSE="debug extractors +login pch playerbot postgres +scriptdev2 sql +world"
 REQUIRED_USE="
 	playerbot? ( world )
 	scriptdev2? ( world )
@@ -109,6 +109,12 @@ cmangos-1_src_install() {
 				-e "s_LogsDir = \"\"_LogsDir = \"/var/log/${PN}\"_" \
 				"${ED}/etc/${PN}/realmd.conf" || die
 		fi
+	fi
+
+	if use sql; then
+		dodir /usr/share/${PN}
+		insinto /usr/share/${PN}
+		doins -r ${S}/sql
 	fi
 
 	keepdir /var/lib/cmangos
