@@ -26,12 +26,8 @@ pkg_nofetch() {
 	einfo "  the archive has to have a parent directory named WoW-1.12-<lang>"
 }
 
-src_configure() {
-	: # not required
-}
-
 src_compile() {
-	local lang="$(wow_get_l10n)"
+	local lang="$(wow-1_get_l10n)"
 
 	for l in ${lang}; do
 		einfo "Extracting dbc's (${l})"
@@ -40,10 +36,7 @@ src_compile() {
 	done
 
 	einfo "Extracting vmaps"
-	local l="enUS"
-	if ! use l10n_en-US; then
-		l="$(echo ${lang} | awk '{ print $1 }')"
-	fi
+	local l="$(wow-1_get_default_l10n)"
 
 	install -d vmaps
 	ad-cmangos-vanilla -i "${S}/WoW-1.12-${l}" -e 1 || die
@@ -58,7 +51,7 @@ src_compile() {
 }
 
 src_install() {
-	local lang="$(wow_get_l10n)"
+	local lang="$(wow-1_get_l10n)"
 
 	dodir "/usr/share/${P}"
 	insinto "/usr/share/${P}"
@@ -75,5 +68,11 @@ src_install() {
 		dodir "/usr/share/${P}/dbc"
 		insinto "/usr/share/${P}/dbc"
 		doins -r "${WORKDIR}/${l}"
+	done
+
+	local l="$(wow-1_get_default_l10n)"
+	for f in $(find "${ED}/usr/share/${P}/dbc/${l}" -type f -name "*.dbc"); do
+		local dbc="$(basename ${f})"
+		dosym "${l}/${dbc}" "/usr/share/${P}/dbc/${dbc}"
 	done
 }

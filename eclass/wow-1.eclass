@@ -13,6 +13,8 @@
 WOW_LANGS="deDE enUS"
 WOW_L10NS="de-DE en-US es-ES fr ko ru zh-CN"
 
+EXPORT_FUNCTIONS src_configure
+
 _wow_set_l10n() {
 	local lang
 	for lang in ${WOW_L10NS}; do
@@ -34,10 +36,13 @@ _wow_set_l10n() {
 		SRC_URI+=" l10n_${l}? ( WoW-${PV}-${lang}.zip )"
 	done
 }
-
 _wow_set_l10n
 
-wow_get_l10n() {
+wow-1_src_configure() {
+	: # not required
+}
+
+wow-1_get_l10n() {
 	local lang
 	lang=" $(usex l10n_de-DE deDE "")"
 	lang+=" $(usex l10n_en-US enUS "")"
@@ -46,5 +51,13 @@ wow_get_l10n() {
 	lang+=" $(usex l10n_ko koKR "")"
 	lang+=" $(usex l10n_ru ruRU "")"
 	lang+=" $(usex l10n_zh-CN zhCN "")"
+	echo "${lang}"
+}
+
+wow-1_get_default_l10n() {
+	local lang="enUS"
+	if ! use l10n_en-US; then
+		lang="$(wow-1_get_l10n | awk '{ print $1 }')"
+	fi
 	echo "${lang}"
 }
