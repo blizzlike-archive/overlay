@@ -5,10 +5,10 @@ EAPI=7
 
 inherit wow-1
 
-LICENSE="WoW-EULA-2006-JUNE"
-SLOT="0"
+LICENSE="WoW-EULA-2007"
+SLOT="1"
 KEYWORDS="amd64 ~x86"
 
 DEPEND="
-	games-server/cmangos-vanilla[extractors]
+	games-server/cmangos-tbc[extractors]
 	"

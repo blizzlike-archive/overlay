@@ -9,13 +9,25 @@
 # @BLURB: 
 # @DESCRIPTION:
 
+DESCRIPTION="World of Warcraft ${PV} client data"
+HOMEPAGE="https://worldofwarcraft.com"
+RESTRICT="fetch"
+IUSE="mmaps"
+S="${WORKDIR}"
+
 #WOW_LANGS="deDE enUS esES frFR koKR ruRU zhCN"
 WOW_LANGS="deDE enUS"
 WOW_L10NS="de-DE en-US es-ES fr ko ru zh-CN"
 
-EXPORT_FUNCTIONS src_configure
+EXPORT_FUNCTIONS pkg_nofetch src_configure src_compile src_install
 
-_wow_set_l10n() {
+_wow-1_get_cmangos_flavor() {
+	if [ "${PV}" = "1.12" ]; then echo "cmangos-vanilla"; fi
+	if [ "${PV}" = "2.4.3" ]; then echo "cmangos-tbc"; fi
+	if [ "${PV}" = "3.3.5a" ]; then echo "cmangos-wotlk"; fi
+}
+
+_wow-1_set_l10n() {
 	local lang
 	for lang in ${WOW_L10NS}; do
 		IUSE_L10N+=" l10n_${lang}"
@@ -36,10 +48,68 @@ _wow_set_l10n() {
 		SRC_URI+=" l10n_${l}? ( WoW-${PV}-${lang}.zip )"
 	done
 }
-_wow_set_l10n
+_wow-1_set_l10n
+
+wow-1_pkg_nofetch() {
+	einfo "You have to own a copy of the WoW client."
+	einfo "  copy the client to /usr/portage/distfiles/WoW-${PV}-<lang>.zip"
+	einfo "  the archive has to have a parent directory named WoW-${PV}-<lang>"
+}
 
 wow-1_src_configure() {
 	: # not required
+}
+
+wow-1_src_compile() {
+	local lang="$(wow-1_get_l10n)"
+	local cmangos="$(_wow-1_get_cmangos_flavor)"
+
+	for l in ${lang}; do
+		einfo "Extracting dbc's (${l})"
+		ad-${cmangos} -i "${S}/WoW-${PV}-${l}" -e 2 || die
+		mv dbc "${l}" || die
+	done
+
+	einfo "Extracting vmaps"
+	local l="$(wow-1_get_default_l10n)"
+
+	install -d vmaps
+	ad-${cmangos} -i "${S}/WoW-${PV}-${l}" -e 1 || die
+	vmap_extractor-${cmangos} -d "${S}/WoW-${PV}-${l}/Data" || die
+	vmap_assembler-${cmangos} Buildings vmaps || die
+
+	if use mmaps; then
+		einfo "Generating mmaps"
+		install -d mmaps
+		MoveMapGen-${cmangos} --offMeshInput "/usr/share/${cmangos}/offmesh.txt"
+	fi
+}
+
+wow-1_src_install() {
+	local lang="$(wow-1_get_l10n)"
+
+	dodir "/usr/share/${P}"
+	insinto "/usr/share/${P}"
+
+	doins -r "${WORKDIR}/maps"
+	doins -r "${WORKDIR}/vmaps"
+
+	if use mmaps; then
+		doins -r "${WORKDIR}/mmaps"
+	fi
+
+	for l in ${lang}; do
+		einfo "Installing dbc's (${l})"
+		dodir "/usr/share/${P}/dbc"
+		insinto "/usr/share/${P}/dbc"
+		doins -r "${WORKDIR}/${l}"
+	done
+
+	local l="$(wow-1_get_default_l10n)"
+	for f in $(find "${ED}/usr/share/${P}/dbc/${l}" -type f -name "*.dbc"); do
+		local dbc="$(basename ${f})"
+		dosym "${l}/${dbc}" "/usr/share/${P}/dbc/${dbc}"
+	done
 }
 
 wow-1_get_l10n() {
