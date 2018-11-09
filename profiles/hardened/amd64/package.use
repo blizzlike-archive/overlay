@@ -2,3 +2,6 @@ dev-libs/boost static-libs
 
 games-server/cmangos-vanilla extractors login scriptdev2 world playerbot sql
 =games-misc/wow-data-1.12 l10n_de-DE l10n_en-US mmaps
+
+games-server/cmangos-tbc extractors login scriptdev2 world playerbot sql
+=games-misc/wow-data-2.4.3 l10n_en-US mmaps

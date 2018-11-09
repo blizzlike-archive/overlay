@@ -89,8 +89,13 @@ cmangos-1_src_install() {
 			insinto "/etc/${PN}"
 			newins "${S}/src/game/AuctionHouseBot/ahbot.conf.dist.in" ahbot.conf
 
+			local wdv
+			if [ "${PN}" = "cmangos-vanilla" ]; then wdv = "1.12"; fi
+			if [ "${PN}" = "cmangos-tbc" ]; then wdv = "2.4.3"; fi
+			if [ "${PN}" = "cmangos-wotlk" ]; then wdv = "3.3.5a"; fi
+
 			sed -i \
-				-e 's_DataDir = "."_DataDir = "/usr/share/wow-data-1.12"_' \
+				-e 's_DataDir = "."_DataDir = "/usr/share/wow-data-${wdv}"_' \
 				-e "s_LogsDir = \"\"_LogsDir = \"/var/log/${PN}\"_" \
 				-e "s_PidFile = \"\"_PidFile = \"/run/${PN}/mangosd.pid\"_" \
 				-e 's_Console.Enable = 1_Console.Enable = 0_' \
