@@ -1,0 +1,25 @@
+#!/sbin/openrc-run
+# Copyright 1999-2018 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+name="cmangos-tbc realmd daemon"
+description="cmangos-tbc wow emulation logon server"
+pidfile=${pidfile:-"/run/cmangos-tbc/realmd.pid"}
+command=/usr/bin/realmd-cmangos-tbc
+command_args=${realmd_args:-"-c /etc/cmangos-tbc/realmd.conf"}
+stopsig="SIGINT"
+user=${user:-cmangos}
+group=${group:-cmangos}
+
+start_stop_daemon_args="--user ${user} --group ${group} \
+	--stdout /var/log/cmangos-tbc/realmd-stdout.log \
+	--background"
+
+depend() {
+	need net
+	after net
+}
+
+start_pre() {
+	install -o ${user} -g ${group} -d /run/cmangos-tbc
+}

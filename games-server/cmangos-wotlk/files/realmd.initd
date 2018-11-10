@@ -1,0 +1,25 @@
+#!/sbin/openrc-run
+# Copyright 1999-2018 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+name="cmangos-wotlk realmd daemon"
+description="cmangos-wotlk wow emulation logon server"
+pidfile=${pidfile:-"/run/cmangos-wotlk/realmd.pid"}
+command=/usr/bin/realmd-cmangos-wotlk
+command_args=${realmd_args:-"-c /etc/cmangos-wotlk/realmd.conf"}
+stopsig="SIGINT"
+user=${user:-cmangos}
+group=${group:-cmangos}
+
+start_stop_daemon_args="--user ${user} --group ${group} \
+	--stdout /var/log/cmangos-wotlk/realmd-stdout.log \
+	--background"
+
+depend() {
+	need net
+	after net
+}
+
+start_pre() {
+	install -o ${user} -g ${group} -d /run/cmangos-wotlk
+}
