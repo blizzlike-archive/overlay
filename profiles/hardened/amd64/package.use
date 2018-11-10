@@ -5,3 +5,6 @@ games-server/cmangos-vanilla extractors login scriptdev2 world playerbot sql
 
 games-server/cmangos-tbc extractors login scriptdev2 world playerbot sql
 =games-misc/wow-data-2.4.3 l10n_en-US mmaps
+
+games-server/cmangos-wotlk extractors login scriptdev2 world playerbot sql
+=games-misc/wow-data-3.3.5a l10n_de-DE mmaps
