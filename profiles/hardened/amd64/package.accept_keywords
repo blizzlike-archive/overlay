@@ -1,3 +1,5 @@
 games-server/cmangos-vanilla ~amd64
 games-server/cmangos-tbc ~amd64
 games-server/cmangos-wotlk ~amd64
+
+games-server/lh-core ~amd64
