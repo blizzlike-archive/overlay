@@ -44,6 +44,7 @@ lh-1_src_configure() {
 		-DUSE_EXTRACTORS="$(usex extractors)"
 		-DSCRIPTS="$(usex scripts)"
 		-DCMAKE_SKIP_INSTALL_RPATH=ON
+		-DUSE_GENERIC_CXX_FLAGS=ON
 	)
 
 	cmake-utils_src_configure
