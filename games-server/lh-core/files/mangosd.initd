@@ -1,0 +1,26 @@
+#!/sbin/openrc-run
+# Copyright 1999-2018 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+name="cmangos-vanilla mangosd daemon"
+description="cmangos-vanilla wow emulation world server"
+pidfile=${pidfile:-"/run/cmangos-vanilla/mangosd.pid"}
+command=/usr/bin/mangosd-cmangos-vanilla
+command_args=${mangosd_args:-"-c /etc/cmangos-vanilla/mangosd.conf"}
+stopsig="SIGINT"
+retry="SIGINT/35"
+user=${user:-cmangos}
+group=${group:-cmangos}
+
+start_stop_daemon_args="--user ${user} --group ${group} \
+	--stdout /var/log/cmangos-vanilla/mangosd-stdout.log \
+	--background"
+
+depend() {
+	need net
+	after net
+}
+
+start_pre() {
+	install -o ${user} -g ${group} -d /run/cmangos-vanilla
+}
