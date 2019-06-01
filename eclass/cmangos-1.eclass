@@ -12,6 +12,7 @@
 inherit user cmake-utils git-r3
 
 EGIT_REPO_URI="https://metagit.org/blizzlike/${PN}.git"
+EGIT_BRANCH="release/${PV}"
 
 LICENSE="GPL-2"
 IUSE="debug extractors +login pch playerbot postgres +scriptdev2 sql +world"
@@ -60,14 +61,13 @@ cmangos-1_src_install() {
 
 	if use extractors; then
 		dodir "/usr/share/${PN}"
-		insinto "/usr/share/${PN}"
-		doins "${S}/contrib/extractor_scripts/offmesh.txt"
+		mv "${ED}/usr/bin/tools/offmesh.txt" "${ED}/usr/share/${PN}/offmesh.txt" || die
 
 		mv "${ED}/usr/bin/tools/MoveMapGen" "${ED}/usr/bin/MoveMapGen-${PN}" || die
 		mv "${ED}/usr/bin/tools/ad" "${ED}/usr/bin/ad-${PN}" || die
 		mv "${ED}/usr/bin/tools/vmap_assembler" "${ED}/usr/bin/vmap_assembler-${PN}" || die
 		mv "${ED}/usr/bin/tools/vmap_extractor" "${ED}/usr/bin/vmap_extractor-${PN}" || die
-		rmdir "${ED}/usr/bin/tools" || die
+		rm -rf "${ED}/usr/bin/tools" || die
 	fi
 
 	if use world || use login || use playerbot; then
