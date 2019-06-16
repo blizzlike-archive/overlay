@@ -12,7 +12,11 @@
 inherit user cmake-utils git-r3
 
 EGIT_REPO_URI="https://metagit.org/blizzlike/${PN}.git"
-EGIT_BRANCH="release/${PV}"
+if  [ "${PV}" = "9999" ]; then
+	EGIT_BRANCH="master"
+else
+	EGIT_BRANCH="release/${PV}"
+fi
 
 LICENSE="GPL-2"
 IUSE="debug extractors +login pch playerbot postgres +scriptdev2 sql +world"
@@ -51,6 +55,7 @@ cmangos-1_src_configure() {
 		-DBUILD_LOGIN_SERVER="$(usex login)"
 		-DBUILD_SCRIPTDEV="$(usex scriptdev2)"
 		-DCMAKE_SKIP_INSTALL_RPATH=ON
+		-DCMAKE_INSTALL_SYSCONFDIR="etc/${PN}"
 	)
 
 	cmake-utils_src_configure
@@ -70,50 +75,51 @@ cmangos-1_src_install() {
 		rm -rf "${ED}/usr/bin/tools" || die
 	fi
 
-	if use world || use login || use playerbot; then
-		dodir /etc
-		mv "${ED}/usr/etc" "${ED}/etc/${PN}" || die
+	if use playerbot || use world || use login; then
+		dodir "/etc/"
+		mv "${ED}/usr/etc/${PN}" "${ED}/etc/${PN}" || die
+		rmdir "${ED}/usr/etc" || die
+	fi
 
-		if use playerbot; then
-			mv "${ED}/etc/${PN}/playerbot.conf.dist" "${ED}/etc/${PN}/playerbot.conf" || die
+	if use playerbot; then
+		mv "${ED}/etc/${PN}/playerbot.conf.dist" "${ED}/etc/${PN}/playerbot.conf" || die
+	fi
+
+	if use world; then
+		if [ -f "${FILESDIR}/mangosd.initd" ]; then
+			newinitd "${FILESDIR}/mangosd.initd" "mangosd-${PN}"
 		fi
+		mv "${ED}/etc/${PN}/mangosd.conf.dist" "${ED}/etc/${PN}/mangosd.conf" || die
+		mv "${ED}/usr/bin/mangosd" "${ED}/usr/bin/mangosd-${PN}" || die
+		rm "${ED}/usr/bin/run-mangosd" || die
 
-		if use world; then
-			if [ -f "${FILESDIR}/mangosd.initd" ]; then
-				newinitd "${FILESDIR}/mangosd.initd" "mangosd-${PN}"
-			fi
-			mv "${ED}/etc/${PN}/mangosd.conf.dist" "${ED}/etc/${PN}/mangosd.conf" || die
-			mv "${ED}/usr/bin/mangosd" "${ED}/usr/bin/mangosd-${PN}" || die
-			rm "${ED}/usr/bin/run-mangosd" || die
+		insinto "/etc/${PN}"
+		newins "${S}/src/game/AuctionHouseBot/ahbot.conf.dist.in" ahbot.conf
 
-			insinto "/etc/${PN}"
-			newins "${S}/src/game/AuctionHouseBot/ahbot.conf.dist.in" ahbot.conf
+		local wdv
+		if [ "${PN}" = "cmangos-vanilla" ]; then wdv="1.12"; fi
+		if [ "${PN}" = "cmangos-tbc" ]; then wdv="2.4.3"; fi
+		if [ "${PN}" = "cmangos-wotlk" ]; then wdv="3.3.5a"; fi
 
-			local wdv
-			if [ "${PN}" = "cmangos-vanilla" ]; then wdv="1.12"; fi
-			if [ "${PN}" = "cmangos-tbc" ]; then wdv="2.4.3"; fi
-			if [ "${PN}" = "cmangos-wotlk" ]; then wdv="3.3.5a"; fi
+		sed -i \
+			-e "s_DataDir = \".\"_DataDir = \"/usr/share/wow-data-${wdv}\"_" \
+			-e "s_LogsDir = \"\"_LogsDir = \"/var/log/${PN}\"_" \
+			-e "s_PidFile = \"\"_PidFile = \"/run/${PN}/mangosd.pid\"_" \
+			-e 's_Console.Enable = 1_Console.Enable = 0_' \
+			"${ED}/etc/${PN}/mangosd.conf" || die
+	fi
 
-			sed -i \
-				-e "s_DataDir = \".\"_DataDir = \"/usr/share/wow-data-${wdv}\"_" \
-				-e "s_LogsDir = \"\"_LogsDir = \"/var/log/${PN}\"_" \
-				-e "s_PidFile = \"\"_PidFile = \"/run/${PN}/mangosd.pid\"_" \
-				-e 's_Console.Enable = 1_Console.Enable = 0_' \
-				"${ED}/etc/${PN}/mangosd.conf" || die
+	if use login; then
+		if [ -f "${FILESDIR}/realmd.initd" ]; then
+			newinitd "${FILESDIR}/realmd.initd" "realmd-${PN}"
 		fi
+		mv "${ED}/etc/${PN}/realmd.conf.dist" "${ED}/etc/${PN}/realmd.conf" || die
+		mv "${ED}/usr/bin/realmd" "${ED}/usr/bin/realmd-${PN}" || die
 
-		if use login; then
-			if [ -f "${FILESDIR}/realmd.initd" ]; then
-				newinitd "${FILESDIR}/realmd.initd" "realmd-${PN}"
-			fi
-			mv "${ED}/etc/${PN}/realmd.conf.dist" "${ED}/etc/${PN}/realmd.conf" || die
-			mv "${ED}/usr/bin/realmd" "${ED}/usr/bin/realmd-${PN}" || die
-
-			sed -i \
-				-e "s_PidFile = \"\"_PidFile = \"/run/${PN}/realmd.pid\"_" \
-				-e "s_LogsDir = \"\"_LogsDir = \"/var/log/${PN}\"_" \
-				"${ED}/etc/${PN}/realmd.conf" || die
-		fi
+		sed -i \
+			-e "s_PidFile = \"\"_PidFile = \"/run/${PN}/realmd.pid\"_" \
+			-e "s_LogsDir = \"\"_LogsDir = \"/var/log/${PN}\"_" \
+			"${ED}/etc/${PN}/realmd.conf" || die
 	fi
 
 	if use sql; then
@@ -122,7 +128,7 @@ cmangos-1_src_install() {
 		doins -r ${S}/sql
 	fi
 
-	keepdir /var/lib/cmangos
+	keepdir /var/lib/${PN}
 	keepdir /var/log/${PN}
 	fowners cmangos /var/log/${PN}
 }
