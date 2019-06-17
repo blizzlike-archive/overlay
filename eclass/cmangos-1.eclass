@@ -55,7 +55,8 @@ cmangos-1_src_configure() {
 		-DBUILD_LOGIN_SERVER="$(usex login)"
 		-DBUILD_SCRIPTDEV="$(usex scriptdev2)"
 		-DCMAKE_SKIP_INSTALL_RPATH=ON
-		-DCMAKE_INSTALL_SYSCONFDIR="etc/${PN}"
+		-DCMAKE_INSTALL_SYSCONFDIR="${EPREFIX}/etc/${PN}"
+		-DCMAKE_INSTALL_DATAROOTDIR="${EPREFIX}/usr/share/${PN}"
 	)
 
 	cmake-utils_src_configure
@@ -65,20 +66,10 @@ cmangos-1_src_install() {
 	cmake-utils_src_install
 
 	if use extractors; then
-		dodir "/usr/share/${PN}"
-		mv "${ED}/usr/bin/tools/offmesh.txt" "${ED}/usr/share/${PN}/offmesh.txt" || die
-
-		mv "${ED}/usr/bin/tools/MoveMapGen" "${ED}/usr/bin/MoveMapGen-${PN}" || die
-		mv "${ED}/usr/bin/tools/ad" "${ED}/usr/bin/ad-${PN}" || die
-		mv "${ED}/usr/bin/tools/vmap_assembler" "${ED}/usr/bin/vmap_assembler-${PN}" || die
-		mv "${ED}/usr/bin/tools/vmap_extractor" "${ED}/usr/bin/vmap_extractor-${PN}" || die
-		rm -rf "${ED}/usr/bin/tools" || die
-	fi
-
-	if use playerbot || use world || use login; then
-		dodir "/etc/"
-		mv "${ED}/usr/etc/${PN}" "${ED}/etc/${PN}" || die
-		rmdir "${ED}/usr/etc" || die
+		mv "${ED}/usr/bin/MoveMapGen" "${ED}/usr/bin/MoveMapGen-${PN}" || die
+		mv "${ED}/usr/bin/ad" "${ED}/usr/bin/ad-${PN}" || die
+		mv "${ED}/usr/bin/vmap_assembler" "${ED}/usr/bin/vmap_assembler-${PN}" || die
+		mv "${ED}/usr/bin/vmap_extractor" "${ED}/usr/bin/vmap_extractor-${PN}" || die
 	fi
 
 	if use playerbot; then
@@ -89,12 +80,10 @@ cmangos-1_src_install() {
 		if [ -f "${FILESDIR}/mangosd.initd" ]; then
 			newinitd "${FILESDIR}/mangosd.initd" "mangosd-${PN}"
 		fi
+		mv "${ED}/etc/${PN}/ahbot.conf.dist" "${ED}/etc/${PN}/ahbot.conf" || die
 		mv "${ED}/etc/${PN}/mangosd.conf.dist" "${ED}/etc/${PN}/mangosd.conf" || die
 		mv "${ED}/usr/bin/mangosd" "${ED}/usr/bin/mangosd-${PN}" || die
 		rm "${ED}/usr/bin/run-mangosd" || die
-
-		insinto "/etc/${PN}"
-		newins "${S}/src/game/AuctionHouseBot/ahbot.conf.dist.in" ahbot.conf
 
 		local wdv
 		if [ "${PN}" = "cmangos-vanilla" ]; then wdv="1.12"; fi
