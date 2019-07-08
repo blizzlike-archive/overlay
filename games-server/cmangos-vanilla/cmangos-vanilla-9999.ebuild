@@ -10,5 +10,3 @@ HOMEPAGE="https://metagit.org/blizzlike/cmangos-vanilla"
 
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-
-PDEPEND="world? ( =games-misc/wow-data-1.12 )"
